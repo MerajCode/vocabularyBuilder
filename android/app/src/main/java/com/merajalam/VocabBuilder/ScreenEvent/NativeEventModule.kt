@@ -25,6 +25,22 @@ class NativeEventModule(private val reactContext: ReactApplicationContext) :
         // Required for NativeEventEmitter
     }
 
+    @ReactMethod
+    fun startForgroundService() {
+
+        val intent = Intent(reactApplicationContext, ScreenMonitorService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            reactApplicationContext.startForegroundService(intent)
+        } else {
+            reactApplicationContext.startService(intent)
+        }
+    }
+
+    @ReactMethod
+    fun stopForgroundService() {
+        val intent = Intent(reactApplicationContext, ScreenMonitorService::class.java)
+            reactApplicationContext.stopService(intent)
+    }
 
     fun sendEvent(event: String) {
         try {
