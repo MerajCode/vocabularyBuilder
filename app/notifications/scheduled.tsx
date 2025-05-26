@@ -1,19 +1,28 @@
 import { ThemedText } from "@/components/ThemedText";
-import * as Notifications from "expo-notifications";
+import WordsDB, { ScheduledNotificationInsert } from "@/controller/handler";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React, { useEffect, useState } from "react";
-import { Button, FlatList, StyleSheet, View } from "react-native";
+import { Alert, FlatList, StyleSheet, View } from "react-native";
 
 export default function ScheduledList() {
-  const [scheduled, setScheduled] = useState<Notifications.NotificationRequest[]>([]);
+  const [scheduled, setScheduled] = useState<ScheduledNotificationInsert[]>([]);
 
   const loadNotifications = async () => {
-    const notifs = await Notifications.getAllScheduledNotificationsAsync();
+    const notifs = await WordsDB.getNotifications();
     setScheduled(notifs);
   };
 
-  const cancelAll = async () => {
-    await Notifications.cancelAllScheduledNotificationsAsync();
+  const deleteF = async (id:number) => {
+    await WordsDB.deleteNotifications(id);
     loadNotifications();
+    Alert.alert("Success", "Notification Delete Successfully")
+  };
+
+  const updateF = async (type:boolean,id:number) => {
+    const tt = !!type ? 0 : 1;
+    await WordsDB.updateNotification(tt,id);
+    loadNotifications();
+    Alert.alert("Success", "Notification Updated Successfully")
   };
 
   useEffect(() => {
@@ -21,23 +30,45 @@ export default function ScheduledList() {
   }, []);
 
   return (
-    <View style={styles.container} >
+    <View style={styles.container}>
       <FlatList
-        ListEmptyComponent={<ThemedText style={{ textAlign: "center", marginTop: 100 }}>No notifications scheduled.</ThemedText>}
+        ListEmptyComponent={
+          <ThemedText style={{ textAlign: "center", marginTop: 100 }}>
+            No notifications scheduled.
+          </ThemedText>
+        }
         data={scheduled}
-        style={{padding:10}}
-        renderItem={({ item }) =>{
-          const data:any = item.trigger;
-          return(
-          <View key={item.identifier} style={styles.item}>
-            <ThemedText>🔔 {"Notification For ("+item.content.data.type+")"}</ThemedText>
-            <ThemedText>{data.seconds/60+" Minutes | " + (data.repeats?"Frequantly":"Once") }</ThemedText>
-          </View>
-        )}
-      }
+        style={{ padding: 10 }}
+        renderItem={({ item }) => {
+          return (
+            <View style={styles.item}>
+              <View key={item.id}>
+                <ThemedText>
+                  🔔 {"Notification For (" + item.type + ")"}
+                </ThemedText>
+                <ThemedText>
+                  {item.repeat_interval + " Minutes Interval "}
+                </ThemedText>
+              </View>
+              <View style={{ flexDirection: "column",gap:4, justifyContent: "center" }}>
+                <MaterialIcons
+                  name={item.is_active ? "stop-circle":"run-circle"}
+                  size={38}
+                  title="Cancel All Notification"
+                  onPress={()=>updateF(Boolean(item.is_active),Number(item.id))}
+                  color="green"
+                />
+                <MaterialIcons
+                  name="cancel"
+                  size={38}
+                  onPress={()=>deleteF(Number(item.id))}
+                  color="#b83f33"
+                />
+              </View>
+            </View>
+          );
+        }}
       />
-
-      <Button title="Cancel All Notification" onPress={cancelAll} color="#b83f33" />
     </View>
   );
 }
@@ -57,5 +88,8 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     marginBottom: 10,
     borderRadius: 5,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 });
