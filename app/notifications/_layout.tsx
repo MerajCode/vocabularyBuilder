@@ -6,6 +6,7 @@ const Layout = () => {
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: true ,title:"Schedule New" }} />
       <Stack.Screen name="scheduled" options={{ headerShown: true,title:"Scheduled List" }} />
+      <Stack.Screen name="about" options={{ headerShown: true,title:"About App" }} />
     </Stack>
   );
 };
