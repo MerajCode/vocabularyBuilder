@@ -1,10 +1,14 @@
-package com.todo22001.VacabBuilder
+package com.merajalam.VocabBuilder.ScreenEvent
 
 import android.util.Log
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.modules.core.DeviceEventManagerModule
+
+import android.os.Build
+import android.content.Intent
+import com.merajalam.VocabBuilder.ForgroundService.ScreenMonitorService
 
 class NativeEventModule(private val reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
@@ -20,6 +24,7 @@ class NativeEventModule(private val reactContext: ReactApplicationContext) :
     fun removeListeners(count: Int) {
         // Required for NativeEventEmitter
     }
+
 
     fun sendEvent(event: String) {
         try {

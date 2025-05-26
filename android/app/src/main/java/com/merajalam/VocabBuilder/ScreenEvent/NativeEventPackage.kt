@@ -1,4 +1,4 @@
-package com.todo22001.VacabBuilder
+package com.merajalam.VocabBuilder.ScreenEvent
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule
