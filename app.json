@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "VacabBuilder",
-    "slug": "VacabBuilder",
+    "name": "VocabBuilder",
+    "slug": "VocabBuilder",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "vacabbuilder",
+    "scheme": "vocabbuilder",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -17,7 +17,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.todo22001.VacabBuilder"
+      "package": "com.merajalam.VocabBuilder"
     },
     "web": {
       "bundler": "metro",
@@ -38,7 +38,8 @@
       "expo-sqlite"
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "newArchitecture": true
     }
   }
 }

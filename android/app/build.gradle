@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.todo22001.VacabBuilder'
+    namespace 'com.merajalam.VocabBuilder'
     defaultConfig {
-        applicationId 'com.todo22001.VacabBuilder'
+        applicationId 'com.merajalam.VocabBuilder'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
