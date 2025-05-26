@@ -1,5 +1,6 @@
 import Title from "@/components/title";
 import WordsDB, { WordData } from "@/controller/handler";
+// import { WordData } from "@/utils/Type/Table";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
@@ -12,16 +13,11 @@ import {
   View,
 } from "react-native";
 
-interface Word extends WordData {
-  id: number;
-  created_at: string;
-}
-
 export default function WordList() {
-  const [words, setWords] = useState<Word[]>([]);
+  const [words, setWords] = useState<WordData[]>([]);
 
   const loadWords = async () => {
-    const allWords = await WordsDB.getAllWords();
+    const allWords = await WordsDB.getAllwordlist();
     setWords(allWords);
   };
 
@@ -62,18 +58,18 @@ export default function WordList() {
                 {item.word} ({item.type})
               </Text>
               {item.meaning && (
-                <Text style={styles.meaning}>💡 {item.meaning}</Text>
+                <Text style={styles.meaning}>💡  {item.meaning}</Text>
               )}
               {item.form1 && (
                 <Text style={styles.forms}>
-                  🧩 Forms: {item.form1}, {item.form2}, {item.form3}
+                  🧩  Forms:  {item.form1},  {item.form2},  {item.form3}
                 </Text>
               )}
               {item.example && (
-                <Text style={styles.example}>✏️ {item.example}</Text>
+                <Text style={styles.example}>&quot; {item.example} &quot;</Text>
               )}
             </View>
-            <TouchableOpacity onPress={() => deleteWord(item.id)}>
+            <TouchableOpacity onPress={() => deleteWord(Number(item.id))}>
               <MaterialIcons name="delete-sweep" size={32} color="#b01a0c" />
             </TouchableOpacity>
           </View>
@@ -111,17 +107,21 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   meaning: {
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight:"semibold",
     color: "#333",
   },
   forms: {
-    fontSize: 14,
+    fontSize: 16,
     fontStyle: "italic",
     color: "#555",
   },
   example: {
-    fontSize: 13,
+    fontSize: 16,
+    fontWeight:"bold",
     color: "#444",
     marginTop: 4,
+    paddingTop:5,
+    textAlign:"center"
   },
 });

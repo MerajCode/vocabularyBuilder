@@ -1,14 +1,39 @@
 import { ThemedText } from '@/components/ThemedText';
 import { useColorScheme } from '@/hooks/useColorScheme.web';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useRouter } from 'expo-router';
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { PermissionsAndroid, Platform, StyleSheet, View } from 'react-native';
 
 const Index = () => {
-  const router = useRouter();
 
   const isDarkMode = useColorScheme();
+
+  useEffect(() => {
+  const requestPermission = async () => {
+    if (Platform.OS === 'android' && Platform.Version >= 33) {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+      );
+      const grantedStorage = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,{
+          title:"Storage Permission Required",
+          message:"App needs access to read files for bulk upload",
+          buttonPositive:"ok"
+        }
+      );
+      
+      if (grantedStorage !== PermissionsAndroid.RESULTS.GRANTED) {
+        console.warn('Storage permission denied!');
+      }
+
+      if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+        console.warn('Notification permission denied!');
+      }
+    }
+  };
+
+  requestPermission();
+}, []);
 
   return (
     <View style={styles.container}>

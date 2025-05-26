@@ -1,7 +1,8 @@
 import { useColorScheme } from '@/hooks/useColorScheme.web';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import React from 'react';
-import { StyleSheet, Text, TouchableNativeFeedback, View } from 'react-native';
+import { StyleSheet, TouchableNativeFeedback, View } from 'react-native';
+import { ThemedText } from '../ThemedText';
 
 interface settingItem{
     title: string,
@@ -9,10 +10,11 @@ interface settingItem{
     onPress?: () => void,
     link?:React.ReactNode,
     textColor?:string,
+    comp?:React.ReactNode
 }
 
 
-const Item = ({title,icon,onPress=()=>0,link,textColor}:settingItem) => {
+const Item = ({title,icon,onPress=()=>0,link,textColor,comp}:settingItem) => {
 
   const isDarkMode = useColorScheme();
 
@@ -37,15 +39,21 @@ const Item = ({title,icon,onPress=()=>0,link,textColor}:settingItem) => {
                 alignItems: "center",
               }}
             >
-              <Text
+              <ThemedText
                 style={{
-                  color: "#fff",
                   fontFamily: "Inter-Medium",
-                  fontSize: 16,
+                  fontSize: 14,
                 }}
               >
                 {title}
-              </Text>
+              </ThemedText>
+              <View style={{flexDirection:"row",alignItems:"center",gap:5}}>
+                {
+                  comp?(
+                    comp
+                  ):("")
+                }
+
               {
                 link?(
                     link
@@ -53,12 +61,13 @@ const Item = ({title,icon,onPress=()=>0,link,textColor}:settingItem) => {
                     <MaterialIcons name="arrow-forward-ios" size={24} color={isDarkMode?"#fff":"#000"} />
                 )
               }
+              </View>
             </View>
           </View>
         </TouchableNativeFeedback>
     );
 }
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});
 
 export default Item;
