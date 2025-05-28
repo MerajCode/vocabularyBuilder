@@ -24,10 +24,14 @@ sqliteDb.execSync(`
 `);
 
 sqliteDb.execSync(`
-  CREATE TABLE IF NOT EXISTS bar_notification (
+  CREATE TABLE IF NOT EXISTS settings (
 	id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	type text,
 	timer integer NOT NULL,
+	unlock_type text,
+	unlock_status integer DEFAULT false,
+	present_type text,
+	present_status integer DEFAULT false,
 	created_at text DEFAULT CURRENT_TIMESTAMP
 );
 `);

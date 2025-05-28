@@ -2,13 +2,13 @@ import { scheduled_notifications } from "@/db/schedule";
 // import { WordData } from '@/utils/Type/Table';
 import { eq, InferInsertModel, sql } from "drizzle-orm";
 import Papa from "papaparse";
-import { bar_notification, wordlist } from "../db/schema";
+import { settings, wordlist } from "../db/schema";
 import { db } from "./database";
 
 export type ScheduledNotificationInsert = InferInsertModel<
   typeof scheduled_notifications
 >;
-export type SettingInsert = InferInsertModel<typeof bar_notification>;
+export type SettingInsert = InferInsertModel<typeof settings>;
 export type WordData = InferInsertModel<typeof wordlist>;
 
 class WordsDB {
@@ -62,13 +62,13 @@ class WordsDB {
     const fixedId = 1; // always operate on ID 1
 
     const result = await db
-      .insert(bar_notification)
+      .insert(settings)
       .values({
         id: fixedId,
         ...settingData,
       })
       .onConflictDoUpdate({
-        target: [bar_notification.id], // conflict on id
+        target: [settings.id], // conflict on id
         set: {
           ...settingData,
         },
@@ -79,11 +79,11 @@ class WordsDB {
   }
   
   static async deletebar(): Promise<void> {
-    await db.delete(bar_notification).run();
+    await db.delete(settings).run();
   }
 
   static async getSetting(): Promise<SettingInsert[]> {
-    const setting = await db.select().from(bar_notification).limit(1).all();
+    const setting = await db.select().from(settings).limit(1).all();
     return setting;
   }
 

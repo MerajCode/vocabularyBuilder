@@ -1,6 +1,6 @@
 import { scheduled_notifications } from "./schedule";
-import { bar_notification } from "./setting";
+import { settings } from "./setting";
 import { wordlist } from "./wordlist";
 
-export { bar_notification, scheduled_notifications, wordlist };
+export { scheduled_notifications, settings, wordlist };
 
