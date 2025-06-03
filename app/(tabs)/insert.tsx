@@ -1,18 +1,20 @@
 import UploadCSV from "@/components/bulk/UploadCSV";
+import SelectBox from "@/components/Form/SelectBox";
 import { ThemedText } from "@/components/ThemedText";
 import WordsDB from "@/controller/handler";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
+import { opts } from "@/utils/staticData";
 import { useState } from "react";
 import {
   Alert,
-  Button,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  View,
+  TouchableOpacity,
+  View
 } from "react-native";
 
 const Insert = () => {
@@ -73,7 +75,7 @@ const Insert = () => {
               fontSize: 22,
               fontWeight: "bold",
               textAlign: "center",
-              marginTop:20
+              marginTop: 20,
             }}
           >
             Insert Single Word
@@ -97,24 +99,9 @@ const Insert = () => {
               },
             ]}
             placeholder="Enter word"
+            placeholderTextColor={isDarkMode ? "#aaa" : "#666"}
             value={word}
             onChangeText={setWord}
-          />
-
-          <Text style={[styles.label, { color: isDarkMode ? "#fff" : "#000" }]}>
-            Type
-          </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                color: isDarkMode ? "#fff" : "#000",
-                borderColor: isDarkMode ? "#444" : "#ccc",
-              },
-            ]}
-            placeholder="e.g. verb, noun"
-            value={type}
-            onChangeText={setType}
           />
 
           <Text style={[styles.label, { color: isDarkMode ? "#fff" : "#000" }]}>
@@ -128,59 +115,86 @@ const Insert = () => {
                 borderColor: isDarkMode ? "#444" : "#ccc",
               },
             ]}
+            placeholderTextColor={isDarkMode ? "#aaa" : "#666"}
             placeholder="Enter meaning"
             value={meaning}
             onChangeText={setMeaning}
           />
 
-          <Text style={[styles.label, { color: isDarkMode ? "#fff" : "#000" }]}>
-            Form 1
-          </Text>
-          <TextInput
+          <Text
             style={[
-              styles.input,
-              {
-                color: isDarkMode ? "#fff" : "#000",
-                borderColor: isDarkMode ? "#444" : "#ccc",
-              },
+              styles.label,
+              { color: isDarkMode ? "#fff" : "#000", marginBottom: 5 },
             ]}
-            placeholder="e.g. run"
-            value={form1}
-            onChangeText={setForm1}
-          />
-
-          <Text style={[styles.label, { color: isDarkMode ? "#fff" : "#000" }]}>
-            Form 2
+          >
+            Type
           </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                color: isDarkMode ? "#fff" : "#000",
-                borderColor: isDarkMode ? "#444" : "#ccc",
-              },
-            ]}
-            placeholder="e.g. ran"
-            value={form2}
-            onChangeText={setForm2}
+          <SelectBox
+            onValueChange={setType}
+            selectedValue={type}
+            placeholder="Select Type"
+            options={opts}
           />
+          {type === "verb" && (
+            <View>
+              <Text
+                style={[styles.label, { color: isDarkMode ? "#fff" : "#000" }]}
+              >
+                Form 1
+              </Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  {
+                    color: isDarkMode ? "#fff" : "#000",
+                    borderColor: isDarkMode ? "#444" : "#ccc",
+                  },
+                ]}
+                placeholderTextColor={isDarkMode ? "#aaa" : "#666"}
+                placeholder="e.g. run"
+                value={form1}
+                onChangeText={setForm1}
+              />
 
-          <Text style={[styles.label, { color: isDarkMode ? "#fff" : "#000" }]}>
-            Form 3
-          </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                color: isDarkMode ? "#fff" : "#000",
-                borderColor: isDarkMode ? "#444" : "#ccc",
-              },
-            ]}
-            placeholder="e.g. run"
-            value={form3}
-            onChangeText={setForm3}
-          />
+              <Text
+                style={[styles.label, { color: isDarkMode ? "#fff" : "#000" }]}
+              >
+                Form 2
+              </Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  {
+                    color: isDarkMode ? "#fff" : "#000",
+                    borderColor: isDarkMode ? "#444" : "#ccc",
+                  },
+                ]}
+                placeholderTextColor={isDarkMode ? "#aaa" : "#666"}
+                placeholder="e.g. ran"
+                value={form2}
+                onChangeText={setForm2}
+              />
 
+              <Text
+                style={[styles.label, { color: isDarkMode ? "#fff" : "#000" }]}
+              >
+                Form 3
+              </Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  {
+                    color: isDarkMode ? "#fff" : "#000",
+                    borderColor: isDarkMode ? "#444" : "#ccc",
+                  },
+                ]}
+                placeholderTextColor={isDarkMode ? "#aaa" : "#666"}
+                placeholder="e.g. run"
+                value={form3}
+                onChangeText={setForm3}
+              />
+            </View>
+          )}
           <Text style={[styles.label, { color: isDarkMode ? "#fff" : "#000" }]}>
             Example
           </Text>
@@ -192,13 +206,16 @@ const Insert = () => {
                 borderColor: isDarkMode ? "#444" : "#ccc",
               },
             ]}
+            placeholderTextColor={isDarkMode ? "#aaa" : "#666"}
             placeholder="e.g. I run every day."
             value={example}
             onChangeText={setExample}
           />
 
-          <View style={styles.button}>
-            <Button title="Insert Word" onPress={handleInsert} />
+          <View>
+            <TouchableOpacity style={styles.button} activeOpacity={0.8} onPress={handleInsert}>
+              <Text style={{fontSize:16,fontWeight:"bold",color:"#fff",textTransform:"uppercase"}}>Insert Word</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -223,6 +240,13 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 20,
+    backgroundColor:"#0a7ea4",
+    padding: 15,
+    fontWeight:"bold",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 6,
+    elevation: 3,
   },
 });
 
