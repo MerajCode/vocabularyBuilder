@@ -1,22 +1,24 @@
+import SelectBox from "@/components/Form/SelectBox";
 import Item from "@/components/Settings/item";
 import { ThemedText } from "@/components/ThemedText";
 import WordsDB from "@/controller/handler";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
+import { opts } from "@/utils/staticData";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import { useNavigation, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
-  Button,
   KeyboardAvoidingView,
+  NativeModules,
   Platform,
   ScrollView,
   StyleSheet,
   Switch,
   Text,
   TextInput,
-  TouchableHighlight,
+  TouchableOpacity,
   View,
 } from "react-native";
 
@@ -49,62 +51,71 @@ export default function NotificationControlScreen() {
     interval: 0,
   });
 
-  const updateSettings = async () => {
+  const updateSettings = useCallback(async () => {
+    console.log("running", stickySetting);
     await WordsDB.SettingUpdate({
-      //sticky
-      type: stickySetting?.type,
-      timer: stickySetting?.interval,
-      //switches
+      type: stickySetting.type,
+      timer: stickySetting.interval,
       unlockStatus: unlock.status,
       unlockType: unlock.type,
       presentStatus: present.status,
       presentType: present.type,
     });
-    // NativeModules.NativeEventModule.stopForgroundService();
-    // setTimeout(() => {
-    //   NativeModules.NativeEventModule.startForgroundService();
-    //   console.log("start")
-    // }, 5000); // 5 second delay
-  };
 
-  const getSettings = async () => {
-    const res = await WordsDB.getSetting();
-    const setting = res[0];
-
-    if (setting) {
-      setStickySetting({ type: setting.type ?? "", interval: setting.timer });
-
-      setPresent({
-        status: setting.presentStatus ?? false,
-        type: setting.presentType ?? "",
-      });
-      setUnlock({
-        status: setting.unlockStatus ?? false,
-        type: setting.unlockType ?? "",
-      });
-    }
-  };
+    NativeModules.NativeEventModule.updateStickyNotification();
+    console.log("start");
+  }, [stickySetting, unlock, present]);
 
   useEffect(() => {
+    const getSettings = async () => {
+      const res = await WordsDB.getSetting();
+      const setting = res[0];
+      console.log(setting);
+      if (setting) {
+        setStickySetting({ type: setting.type ?? "", interval: setting.timer });
+
+        setPresent({
+          status: setting.presentStatus ?? false,
+          type: setting.presentType ?? "",
+        });
+        setUnlock({
+          status: setting.unlockStatus ?? false,
+          type: setting.unlockType ?? "",
+        });
+      }
+    };
     getSettings(); // Load settings when component mounts
-  }, []); // Run only once
+  }, []);
 
   const navigation = useRouter();
   const navigate = useNavigation();
 
-  navigate.setOptions({
-    headerRight: () => (
-      <TouchableHighlight onPress={updateSettings} style={{flexDirection:"row",alignItems:"center",gap:1,backgroundColor:"rgb(6, 188, 238)"}} >
-        <Text>Update</Text>
-        <MaterialIcons name="sync" size={20} color={Dark} />
-      </TouchableHighlight>
-    ),
-  });
-
   //dark component style
   const isDarkMode = useColorScheme();
+  const isDark = isDarkMode === "dark";
   const Dark = isDarkMode === "dark" ? "#fff" : "#000";
-  const Darkb = isDarkMode === "dark" ? "#444" : "#ccc";
+
+  useEffect(() => {
+    navigate.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={updateSettings}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 1,
+            right: 15,
+            padding: 7,
+            borderRadius: 10,
+            backgroundColor:isDark ? "#242628":"#0a7ea4",
+          }}
+        >
+          <Text style={{ fontWeight: "bold", color: "#fff" }}>Update</Text>
+          <MaterialIcons name="sync" size={20} color={isDark ? "#aaa":"#fff"} />
+        </TouchableOpacity>
+      ),
+    });
+  }, [Dark, navigate, updateSettings]);
 
   return (
     <KeyboardAvoidingView
@@ -120,25 +131,23 @@ export default function NotificationControlScreen() {
             <Switch
               style={{ height: 20 }}
               value={present.status}
+              trackColor={{ false: "#767577", true: "#81b0ff" }}
               onValueChange={(status) =>
-                setUnlock((pre) => ({ ...pre, status }))
+                setPresent((pre) => ({ ...pre, status }))
               }
             />
           }
           comp={
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  minWidth: 100,
-                  color: Dark,
-                  borderColor: Darkb,
-                },
-              ]}
-              placeholder="Enter word"
-              value={present.type}
-              onChangeText={(type) => setPresent((pre) => ({ ...pre, type }))}
-            />
+            <View style={{ width: 90 }}>
+              <SelectBox
+                selectedValue={present.type}
+                placeholder="Any"
+                onValueChange={(type) =>
+                  setPresent((pre) => ({ ...pre, type }))
+                }
+                options={cusOps}
+              />
+            </View>
           }
         />
         <Item
@@ -147,6 +156,7 @@ export default function NotificationControlScreen() {
           link={
             <Switch
               style={{ height: 20 }}
+              trackColor={{ false: "#767577", true: "#81b0ff" }}
               value={unlock.status}
               onValueChange={(status) =>
                 setUnlock((pre) => ({ ...pre, status }))
@@ -154,19 +164,14 @@ export default function NotificationControlScreen() {
             />
           }
           comp={
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  minWidth: 100,
-                  color: Dark,
-                  borderColor: Darkb,
-                },
-              ]}
-              placeholder="Enter word"
-              value={unlock.type}
-              onChangeText={(type) => setUnlock((pre) => ({ ...pre, type }))}
-            />
+            <View style={{ width: 90 }}>
+              <SelectBox
+                selectedValue={unlock.type}
+                placeholder="Any"
+                onValueChange={(type) => setUnlock((pre) => ({ ...pre, type }))}
+                options={cusOps}
+              />
+            </View>
           }
         />
 
@@ -192,20 +197,14 @@ export default function NotificationControlScreen() {
           </ThemedText>
           <View style={styles.items}>
             <ThemedText style={styles.label}>Word Type</ThemedText>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  color: Dark,
-                  borderColor: Darkb,
-                },
-              ]}
-              placeholder="Enter word"
-              value={stickySetting.type}
-              onChangeText={(type) =>
-                setStickySetting((pre) => ({ ...pre, type }))
-              }
-            />
+            <View style={[styles.input,{ width: 90 }]}>
+              <SelectBox
+                selectedValue={stickySetting.type}
+                placeholder="Any"
+                onValueChange={(type) =>setStickySetting((pre) => ({ ...pre, type }))}
+                options={cusOps}
+              />
+            </View>
           </View>
           <View style={styles.items}>
             <ThemedText style={styles.label}>Interval (min)</ThemedText>
@@ -214,10 +213,12 @@ export default function NotificationControlScreen() {
                 styles.input,
                 {
                   color: Dark,
-                  borderColor: Darkb,
+                  borderWidth:1,
+                  borderColor:(isDark ? "#444" : "#ccc"),
+                  borderRadius:5,
                 },
               ]}
-              placeholder="Enter word"
+              placeholderTextColor={isDark ? "#aaa" : "#666"}
               keyboardType="number-pad"
               value={String(stickySetting.interval)}
               onChangeText={(interval) =>
@@ -245,11 +246,6 @@ export default function NotificationControlScreen() {
             onPress={() => navigation.push("/notifications/about")}
           />
         </View>
-        <View>
-          <TouchableHighlight onPress={updateSettings}>
-            <Button title="Apply Changes" />
-          </TouchableHighlight>
-        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -260,7 +256,8 @@ const Divider = ({ title }: { title: string }) => {
     <Text
       style={{
         fontFamily: "Inter-Bold",
-        fontSize: 16,
+        fontWeight:"bold",
+        fontSize: 17,
         paddingVertical: 5,
         paddingHorizontal: 8,
         color: "#959595",
@@ -280,11 +277,8 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   input: {
-    borderWidth: 1,
     minWidth: 150,
-    maxHeight: 38,
-    backgroundColor: "none",
-    borderRadius: 50,
+    maxHeight: 40,
     textAlign: "center",
     marginTop: 4,
   },
@@ -293,3 +287,5 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 });
+
+const cusOps = [{ value: "", label: "Any" },...opts];
