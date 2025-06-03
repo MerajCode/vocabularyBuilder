@@ -80,28 +80,4 @@ class MainActivity : ReactActivity() {
       // because it's doing more than [Activity.moveTaskToBack] in fact.
       super.invokeDefaultOnBackPressed()
   }
-
- fun testDb() {
-    val dbName = "myvb.db"
-    val dbFile = "/data/data/com.merajalam.VocabBuilder/files/SQLite/myvb.db"
-
-    val db = SQLiteDatabase.openDatabase(dbFile, null, SQLiteDatabase.OPEN_READONLY)
-
-    try {
-        val cursor = db.rawQuery("SELECT * FROM words", null)
-        while (cursor.moveToNext()) {
-            val id = cursor.getInt(cursor.getColumnIndexOrThrow("id"))
-            val word = cursor.getString(cursor.getColumnIndexOrThrow("word"))
-            val meaning = cursor.getString(cursor.getColumnIndexOrThrow("meaning"))
-            val example = cursor.getString(cursor.getColumnIndexOrThrow("example"))
-
-            Log.d("WordEntry", "ID: $id | Word: $word | Meaning: $meaning | Example: $example")
-        }
-        cursor.close()
-        db.close()
-        Log.d("testDb", "✅ Read success")
-    } catch (e: Exception) {
-        Log.e("testDb", "❌ DB read failed", e)
-    }
-}
 }

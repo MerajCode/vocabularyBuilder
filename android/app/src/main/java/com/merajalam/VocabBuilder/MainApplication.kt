@@ -16,7 +16,6 @@ import com.facebook.soloader.SoLoader
 import expo.modules.ApplicationLifecycleDispatcher
 import expo.modules.ReactNativeHostWrapper
 import com.merajalam.VocabBuilder.ScreenEvent.NativeEventPackage
-import com.merajalam.VocabBuilder.ScreenEvent.ScreenReceiver
 import android.content.IntentFilter
 import android.content.Intent
 
@@ -54,14 +53,6 @@ class MainApplication : Application(), ReactApplication {
       load()
     }
     ApplicationLifecycleDispatcher.onApplicationCreate(this)
-
-    val filter = IntentFilter().apply {
-        addAction(Intent.ACTION_SCREEN_ON)
-        addAction(Intent.ACTION_SCREEN_OFF)
-        addAction(Intent.ACTION_USER_PRESENT)
-    }
-    registerReceiver(ScreenReceiver(), filter)
-
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
