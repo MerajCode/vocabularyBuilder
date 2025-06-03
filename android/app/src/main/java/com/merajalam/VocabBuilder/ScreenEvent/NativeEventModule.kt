@@ -26,14 +26,20 @@ class NativeEventModule(private val reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
-    fun startForgroundService() {
-
-        val intent = Intent(reactApplicationContext, ScreenMonitorService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            reactApplicationContext.startForegroundService(intent)
-        } else {
-            reactApplicationContext.startService(intent)
+    fun updateStickyNotification() {
+        
+        try {
+            val intent = Intent(reactApplicationContext, ScreenMonitorService::class.java)
+            intent.action = "UPDATE_STICKY_NOTIFICATION"
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                reactApplicationContext.startForegroundService(intent)
+            } else {
+                reactApplicationContext.startService(intent)
+            }
+        } catch (e: Exception) {
+            Log.d("UPDATE_FAILED", e.message ?: "Unknown error")
         }
+            // Log.d("startForgroundService","Unknown error")
     }
 
     @ReactMethod
