@@ -1,7 +1,7 @@
 import Title from "@/components/title";
 import WordsDB, { WordData } from "@/controller/handler";
 // import { WordData } from "@/utils/Type/Table";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Octicons from "@expo/vector-icons/Octicons";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 
@@ -20,6 +21,8 @@ export default function WordList() {
     const allWords = await WordsDB.getAllwordlist();
     setWords(allWords);
   };
+
+  const isDard = useColorScheme() === "dark";
 
   const deleteWord = async (id: number) => {
     Alert.alert(
@@ -52,13 +55,13 @@ export default function WordList() {
         ListHeaderComponent={<Title title={"("+words.length+") Word List"} />}
         ListEmptyComponent={<Text style={styles.empty}>No words found.</Text>}
         renderItem={({ item }) => (
-          <View key={item.id} style={styles.wordItem}>
+          <View key={item.id} style={[styles.wordItem,{backgroundColor:isDard?"#242628":"#fff"}]}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.wordText}>
+              <Text style={[styles.wordText,{color:isDard?"#fff":"#000"}]}>
                 {item.word} ({item.type})
               </Text>
               {item.meaning && (
-                <Text style={styles.meaning}>💡  {item.meaning}</Text>
+                <Text style={[styles.meaning,{color:isDard?"#fff":"#000"}]}>💡  {item.meaning}</Text>
               )}
               {item.form1 && (
                 <Text style={styles.forms}>
@@ -70,7 +73,7 @@ export default function WordList() {
               )}
             </View>
             <TouchableOpacity onPress={() => deleteWord(Number(item.id))}>
-              <MaterialIcons name="delete-sweep" size={32} color="#b01a0c" />
+              <Octicons name="repo-deleted" size={25} color={isDard ? "#5c5555" : "#ccc"} />
             </TouchableOpacity>
           </View>
         )}
@@ -89,13 +92,13 @@ const styles = StyleSheet.create({
   },
   empty: {
     fontSize: 16,
-    color: "#666",
+    color: "#B5AA8C",
     textAlign: "center",
     marginTop: 20,
   },
   wordItem: {
     flexDirection: "row",
-    backgroundColor: "#b8b8b8",
+    backgroundColor: "#242628",
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,
@@ -105,11 +108,13 @@ const styles = StyleSheet.create({
   wordText: {
     fontSize: 18,
     fontWeight: "bold",
+    color:"white",
+    textTransform:"capitalize"
   },
   meaning: {
     fontSize: 16,
     fontWeight:"semibold",
-    color: "#333",
+    color: "white",
   },
   forms: {
     fontSize: 16,
@@ -119,7 +124,7 @@ const styles = StyleSheet.create({
   example: {
     fontSize: 16,
     fontWeight:"bold",
-    color: "#444",
+    color: "#B5AA8C",
     marginTop: 4,
     paddingTop:5,
     textAlign:"center"

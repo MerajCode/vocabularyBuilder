@@ -1,6 +1,8 @@
+import SelectBox from "@/components/Form/SelectBox";
 import { ThemedText } from "@/components/ThemedText";
 import WordsDB from "@/controller/handler";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
+import { opts } from "@/utils/staticData";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -14,7 +16,7 @@ import {
 
 export default function Index() {
   const [customTime, setCustomTime] = useState("10"); // in seconds
-  const [type, setType] = useState("verb"); // in seconds
+  const [type, setType] = useState<string>(""); // in seconds
 
   const navigation = useRouter();
 
@@ -29,40 +31,8 @@ export default function Index() {
     }
     Alert.alert("Success", "ID : " + result + " Scheduled successfully.");
   };
-  // const scheduleNotificationAsync = async (
-  //   seconds?: number,
-  //   repeats = false
-  // ) => {
-  //   const word = await WordsDB.getRandWord(type);
-  //   if (!word) {
-  //     Alert.alert("Error", "Somthing Went Wrong!");
-  //   } else {
-  //     // 💬 Create dynamic message based on word type
-  //     let title = `${word.word}: ${word.meaning}`;
-  //     let body = `Example : ${word.example}`;
-  //     if (word.type === "verb") {
-  //       body = `1st: ${word.form1} | 2nd: ${word.form2} | 3rd: ${word.form3}`;
-  //     }
-  //     await Notifications.scheduleNotificationAsync({
-  //       content: {
-  //         title: title,
-  //         body: body,
-  //         priority: Notifications.AndroidNotificationPriority.HIGH,
-  //         data: { type },
-  //       },
-  //       trigger: seconds
-  //         ? {
-  //             type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-  //             seconds,
-  //             repeats,
-  //           }
-  //         : null,
-  //     });
-  //     Alert.alert("Success", "Scheduled successfully.");
-  //   }
-  // };
 
-  const isDarkMode = useColorScheme();
+  const isDarkMode = useColorScheme() ==="dark";
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -74,18 +44,13 @@ export default function Index() {
           value={customTime}
           onChangeText={setCustomTime}
           keyboardType="numeric"
-          style={[styles.input, { color: isDarkMode ? "white" : "black" }]}
+          style={[styles.input, { color: isDarkMode ? "white" : "black",borderColor: isDarkMode ? "#444" : "#ccc" }]}
         />
       </View>
 
-      <View style={{ paddingVertical: 10 }}>
+      <View style={{ paddingVertical: 10,gap:5 }}>
         <ThemedText>Word Type</ThemedText>
-        <TextInput
-          value={type}
-          placeholder="Enter Type"
-          onChangeText={setType}
-          style={[styles.input, { color: isDarkMode ? "white" : "black" }]}
-        />
+        <SelectBox onValueChange={setType} selectedValue={type} options={cusOps} placeholder="Word Type" />
       </View>
 
       {/* Buttons */}
@@ -122,8 +87,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
+    borderWidth:1,
     padding: 8,
     marginTop: 5,
     borderRadius: 5,
@@ -133,3 +97,5 @@ const styles = StyleSheet.create({
     gap: 10,
   },
 });
+
+const cusOps = [{ value: "", label: "Any" },...opts];

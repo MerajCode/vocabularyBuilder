@@ -17,6 +17,7 @@ interface settingItem{
 const Item = ({title,icon,onPress=()=>0,link,textColor,comp}:settingItem) => {
 
   const isDarkMode = useColorScheme();
+  const Dark = isDarkMode === "dark" ? "#fff" : "#000";
 
     return (
         <TouchableNativeFeedback onPress={()=>onPress()}>
@@ -58,7 +59,7 @@ const Item = ({title,icon,onPress=()=>0,link,textColor,comp}:settingItem) => {
                 link?(
                     link
                 ):(
-                    <MaterialIcons name="arrow-forward-ios" size={24} color={isDarkMode?"#fff":"#000"} />
+                    <MaterialIcons name="arrow-forward-ios" size={24} color={Dark} />
                 )
               }
               </View>

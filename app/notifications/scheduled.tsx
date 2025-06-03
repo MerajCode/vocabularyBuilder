@@ -44,7 +44,7 @@ export default function ScheduledList() {
             <View style={styles.item}>
               <View key={item.id}>
                 <ThemedText>
-                  🔔 {"Notification For (" + item.type + ")"}
+                  🔔 {"Notification For (" + (item.type || "Any") + ")"}
                 </ThemedText>
                 <ThemedText>
                   {item.repeat_interval + " Minutes Interval "}

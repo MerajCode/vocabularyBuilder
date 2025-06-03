@@ -47,7 +47,7 @@ export default function UploadCSV() {
   return (
     <View style={styles.container}>
       <ThemedText style={{ marginBottom: 20 ,fontSize:22}}>Insert bulk words</ThemedText>
-      <Button title="📄 Upload CSV" onPress={handleUpload} />
+      <Button title="📄 Upload CSV" color={"#0a7ea4"} onPress={handleUpload} />
       {loading && <ActivityIndicator style={{ marginTop: 20 }} />}
       {status && <Text style={styles.status}>{status}</Text>}
     </View>
