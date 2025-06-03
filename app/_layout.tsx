@@ -11,7 +11,9 @@ import "react-native-reanimated";
 import { databaseName, sqliteDb } from "@/controller/database";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { SQLiteProvider } from "expo-sqlite";
-import { useSQLiteDevTools } from 'expo-sqlite-devtools';
+import { useSQLiteDevTools } from "expo-sqlite-devtools";
+import { useEffect } from "react";
+import { PermissionsAndroid, Platform, Text } from "react-native";
 
 export default function RootLayout() {
   useSQLiteDevTools(sqliteDb);
@@ -21,15 +23,40 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
+  useEffect(() => {
+  const requestPermissions = async () => {
+    if (Platform.OS === "android") {
+      if (Platform.Version >= 33) {
+        await PermissionsAndroid.requestMultiple([
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO,
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+        ]);
+      } else {
+        await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        );
+      }
+    }
+  };
+
+  requestPermissions().catch((err) => console.warn("Permission error:", err));
+}, []);
+
   if (!loaded) {
     // Async font loading only occurs in development.
-    return null;
+    console.log("Loading fonts...")
+    return <Text style={{ padding: 50 }}>Loading fonts...</Text>;
   }
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <SQLiteProvider databaseName={databaseName}  >
-        <Stack>
+      <SQLiteProvider databaseName={databaseName}>
+        <Stack
+          screenOptions={{
+            animation: "ios_from_right",
+          }}
+        >
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="notifications" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
