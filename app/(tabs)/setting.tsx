@@ -1,4 +1,4 @@
-import SelectBox from "@/components/Form/SelectBox";
+import MultiSelectBox from "@/components/Form/MultiSelectBox";
 import Item from "@/components/Settings/item";
 import { ThemedText } from "@/components/ThemedText";
 import WordsDB from "@/controller/handler";
@@ -10,6 +10,7 @@ import Octicons from "@expo/vector-icons/Octicons";
 import { useNavigation, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   NativeModules,
   Platform,
@@ -52,7 +53,7 @@ export default function NotificationControlScreen() {
   });
 
   const updateSettings = useCallback(async () => {
-    console.log("running", stickySetting);
+    Alert.alert("Success", "Update Successful.");
     await WordsDB.SettingUpdate({
       type: stickySetting.type,
       timer: stickySetting.interval,
@@ -63,7 +64,6 @@ export default function NotificationControlScreen() {
     });
 
     NativeModules.NativeEventModule.updateStickyNotification();
-    console.log("start");
   }, [stickySetting, unlock, present]);
 
   useEffect(() => {
@@ -107,11 +107,15 @@ export default function NotificationControlScreen() {
             right: 15,
             padding: 7,
             borderRadius: 10,
-            backgroundColor:isDark ? "#242628":"#0a7ea4",
+            backgroundColor: isDark ? "#242628" : "#0a7ea4",
           }}
         >
           <Text style={{ fontWeight: "bold", color: "#fff" }}>Update</Text>
-          <MaterialIcons name="sync" size={20} color={isDark ? "#aaa":"#fff"} />
+          <MaterialIcons
+            name="sync"
+            size={20}
+            color={isDark ? "#aaa" : "#fff"}
+          />
         </TouchableOpacity>
       ),
     });
@@ -139,13 +143,13 @@ export default function NotificationControlScreen() {
           }
           comp={
             <View style={{ width: 90 }}>
-              <SelectBox
+              <MultiSelectBox
                 selectedValue={present.type}
                 placeholder="Any"
                 onValueChange={(type) =>
                   setPresent((pre) => ({ ...pre, type }))
                 }
-                options={cusOps}
+                options={opts}
               />
             </View>
           }
@@ -165,11 +169,11 @@ export default function NotificationControlScreen() {
           }
           comp={
             <View style={{ width: 90 }}>
-              <SelectBox
+              <MultiSelectBox
                 selectedValue={unlock.type}
                 placeholder="Any"
                 onValueChange={(type) => setUnlock((pre) => ({ ...pre, type }))}
-                options={cusOps}
+                options={opts}
               />
             </View>
           }
@@ -197,12 +201,14 @@ export default function NotificationControlScreen() {
           </ThemedText>
           <View style={styles.items}>
             <ThemedText style={styles.label}>Word Type</ThemedText>
-            <View style={[styles.input,{ width: 90 }]}>
-              <SelectBox
+            <View style={[styles.input, { width: 90 }]}>
+              <MultiSelectBox
                 selectedValue={stickySetting.type}
                 placeholder="Any"
-                onValueChange={(type) =>setStickySetting((pre) => ({ ...pre, type }))}
-                options={cusOps}
+                onValueChange={(type) =>
+                  setStickySetting((pre) => ({ ...pre, type }))
+                }
+                options={opts}
               />
             </View>
           </View>
@@ -213,9 +219,9 @@ export default function NotificationControlScreen() {
                 styles.input,
                 {
                   color: Dark,
-                  borderWidth:1,
-                  borderColor:(isDark ? "#444" : "#ccc"),
-                  borderRadius:5,
+                  borderWidth: 1,
+                  borderColor: isDark ? "#444" : "#ccc",
+                  borderRadius: 5,
                 },
               ]}
               placeholderTextColor={isDark ? "#aaa" : "#666"}
@@ -256,7 +262,7 @@ const Divider = ({ title }: { title: string }) => {
     <Text
       style={{
         fontFamily: "Inter-Bold",
-        fontWeight:"bold",
+        fontWeight: "bold",
         fontSize: 17,
         paddingVertical: 5,
         paddingHorizontal: 8,
@@ -287,5 +293,3 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 });
-
-const cusOps = [{ value: "", label: "Any" },...opts];
