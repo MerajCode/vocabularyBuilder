@@ -15,12 +15,10 @@ class ScreenReceiver() : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         when (intent?.action) {
             Intent.ACTION_SCREEN_ON -> {
-                Log.d("ScreenReceiver", "🔓 Screen ON")
                 listener?.onScreenOn()
             }
 
             Intent.ACTION_USER_PRESENT -> {
-                Log.d("ScreenReceiver", "👤 User Present (unlocked)")
                 listener?.onUserPresent()
             }
         }

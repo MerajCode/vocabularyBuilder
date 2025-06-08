@@ -12,12 +12,16 @@ import com.merajalam.VocabBuilder.Database.Settings
 
 class ScreenMonitorService : Service(), ScreenEventListener {
 
-    private val CHANNEL_ID = "Vocabulary_Builder"
+    companion object {
+        const val STICKY_CHANNEL_ID = "Vocabulary_Builder_Sticky"
+        const val EVENT_CHANNEL_ID = "event_notification"
+    }
+
     private val NOTIFICATION_ID = 1
     private lateinit var controller: Controller
 
     private val handler = Handler(Looper.getMainLooper())
-    private var updateIntervalMillis: Long = 24*60*2*30_000L
+    private var updateIntervalMillis: Long = 24 * 60 * 2 * 30_000L
     private var wordType: String = ""
     private lateinit var screenReceiver: ScreenReceiver
     private val lastTriggeredMap = mutableMapOf<Int, Long>()
@@ -28,6 +32,7 @@ class ScreenMonitorService : Service(), ScreenEventListener {
         super.onCreate()
         controller = Controller(this)
         createNotificationChannel()
+        createNotificationChannelForEvent()
         waitForTablesAndStart()
     }
 
@@ -118,28 +123,35 @@ class ScreenMonitorService : Service(), ScreenEventListener {
 
     private fun buildNotification(title: String, content: String, group: String): Notification {
         val icon = if (group == "foreground") R.drawable.ic_custom_notification else R.mipmap.ic_launcher
+        
+        val channelId = if (group == "foreground") STICKY_CHANNEL_ID else EVENT_CHANNEL_ID
 
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Notification.Builder(this, CHANNEL_ID)
+        val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Notification.Builder(this, channelId)
         } else {
             Notification.Builder(this)
-        }.apply {
+        }
+
+        builder.apply {
             setContentTitle(title)
-            setStyle(Notification.BigTextStyle().bigText(content))
-            setPriority(Notification.PRIORITY_HIGH)
-            setCategory(Notification.CATEGORY_MESSAGE)
-            setDefaults(Notification.DEFAULT_ALL)
-            setGroup(group)
+            setContentText(content)
             setSmallIcon(icon)
-            setOngoing(true)
-        }.build()
+            setGroup(group)
+            
+            setOngoing(group == "foreground")
+            
+            if (channelId == EVENT_CHANNEL_ID) {
+                setCategory(Notification.CATEGORY_MESSAGE)
+            }
+        }
+        return builder.build()
     }
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                CHANNEL_ID,
-                "VocabBuilder Notifications",
+                STICKY_CHANNEL_ID,
+                "Sticky Notifications",
                 NotificationManager.IMPORTANCE_LOW
             )
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -147,23 +159,36 @@ class ScreenMonitorService : Service(), ScreenEventListener {
         }
     }
 
-    // --------------- EVENT LISTENER METHODS --------------------
-//screen on
-    override fun onScreenOn() {
-        if (canTriggerEvent()) {
-            val setting = fetchSettings()
-            if (setting.presentStatus) {
-                showWordNotification(setting.presentType)
-            }
+    private fun createNotificationChannelForEvent() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                EVENT_CHANNEL_ID, 
+                "Event & Scheduled Notifications",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(channel)
         }
     }
-//Unlock
+
+    // --------------- EVENT LISTENER METHODS --------------------
+    override fun onScreenOn() {
+        val setting = fetchSettings()
+            if (setting.presentStatus) {
+                if (canTriggerEvent()) {
+                    showWordNotification(setting.presentType)
+                }
+            }
+            Log.d("ScreenReceiver", "🔓 Screen ON")
+    }
+
     override fun onUserPresent() {
         if (canTriggerEvent()) {
             val setting = fetchSettings()
             if (setting.unlockStatus) {
                 showWordNotification(setting.unlockType)
             }
+            Log.d("ScreenReceiver", "👤 User Present (unlocked)")
         }
     }
 
