@@ -40,8 +40,11 @@ class Controller(private val context: Context) {
         var cursor: Cursor? = null
 
         return try {
-            cursor = if (!wordType.isNullOrEmpty()) {
-                db.rawQuery("SELECT * FROM words WHERE type = ? ORDER BY RANDOM() LIMIT 1", arrayOf(wordType))
+            cursor = if (!wordType.isNullOrBlank()) {
+                val types = wordType.split(",").map { it.trim() }.filter { it.isNotEmpty() } // e.g., ["verb", "adverb", "objective"]
+                val placeholders = types.joinToString(",") { "?" } // "?, ?, ?"
+                val query = "SELECT * FROM words WHERE type IN ($placeholders) ORDER BY RANDOM() LIMIT 1"
+                db.rawQuery(query, types.toTypedArray())
             } else {
                 db.rawQuery("SELECT * FROM words ORDER BY RANDOM() LIMIT 1", null)
             }
