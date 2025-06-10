@@ -1,15 +1,14 @@
 import React, { useMemo, useState } from "react";
 import {
-    FlatList,
-    Modal,
-    Pressable,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    useColorScheme,
-    View,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  useColorScheme,
+  View,
 } from "react-native";
+import ModalComponent from "../ModalComponent";
 
 interface ops {
   value: string;
@@ -29,19 +28,16 @@ const MultiSelectBox = ({
   onValueChange,
   placeholder,
 }: props) => {
-  const [modalVisible, setModalVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
 
-  // String prop ko array me convert karna
   const selectedItemsArray = useMemo(() => {
     if (!selectedValue) return [];
     const values = selectedValue.split(",");
     return options.filter((opt) => values.includes(opt.value));
   }, [selectedValue, options]);
 
-  // Search ke liye options filter karna
   const filteredOptions = useMemo(() => {
     return options.filter((option) =>
       option.label.toLowerCase().includes(searchTerm.toLowerCase())
@@ -70,22 +66,36 @@ const MultiSelectBox = ({
   };
 
   const handleSelectAll = () => {
-    const allValuesString = options.map(opt => opt.value).join(',');
+    const allValuesString = options.map((opt) => opt.value).join(",");
     onValueChange(allValuesString);
   };
 
   const handleClearAll = () => {
-    onValueChange('');
+    onValueChange("");
   };
 
   const renderItem = ({ item }: { item: ops }) => {
     const selected = isSelected(item);
     return (
-      <Pressable onPress={() => handleSelect(item)} style={styles.itemContainer}>
-        <View style={[styles.checkbox, selected ? styles.checkboxSelected : (isDarkMode ? styles.checkboxDark : {})]}>
+      <Pressable
+        onPress={() => handleSelect(item)}
+        style={styles.itemContainer}
+      >
+        <View
+          style={[
+            styles.checkbox,
+            selected
+              ? styles.checkboxSelected
+              : isDarkMode
+              ? styles.checkboxDark
+              : {},
+          ]}
+        >
           {selected && <Text style={styles.checkmark}>✓</Text>}
         </View>
-        <Text style={[styles.itemText, { color: isDarkMode ? "#E0E0E0" : "#333" }]}>
+        <Text
+          style={[styles.itemText, { color: isDarkMode ? "#E0E0E0" : "#333" }]}
+        >
           {item.label}
         </Text>
       </Pressable>
@@ -93,81 +103,67 @@ const MultiSelectBox = ({
   };
 
   // Styles for dark and light mode
-  const modalBackgroundColor = isDarkMode ? "#1E1E1E" : "#FFFFFF";
   const textColor = isDarkMode ? "#E0E0E0" : "#333";
   const inputBackgroundColor = isDarkMode ? "#333333" : "#F0F0F0";
   const inputTextColor = isDarkMode ? "#FFFFFF" : "#000000";
   const borderColor = isDarkMode ? "#444" : "#ccc";
 
-
   return (
-    <SafeAreaView style={styles.wrapper}>
-      <Pressable
-        style={[styles.selectButton, { borderColor }]}
-        onPress={() => setModalVisible(true)}
-      >
-        <Text style={[styles.selectButtonText, { color: textColor }]}>
-          {selectedItemsArray.length > 0
-            ? `${selectedItemsArray.length} std`
-            : placeholder || "Select items"}
-        </Text>
-        <Text style={{ color: textColor }}>▼</Text>
-      </Pressable>
+    <ModalComponent
+      trigger={
+        <View style={[styles.selectButton, { borderColor }]}>
+          <Text style={[styles.selectButtonText, { color: textColor }]}>
+            {selectedItemsArray.length > 0
+              ? `${selectedItemsArray.length} std`
+              : placeholder || "Select items"}
+          </Text>
+          <Text style={{ color: textColor }}>▼</Text>
+        </View>
+      }
+      header={{ title: "Select Items" }}
+    >
+      <>
+        <TextInput
+          style={[
+            styles.searchInput,
+            {
+              backgroundColor: inputBackgroundColor,
+              color: inputTextColor,
+              borderColor,
+            },
+          ]}
+          placeholder="Search..."
+          placeholderTextColor={isDarkMode ? "#888" : "#999"}
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+        />
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <Pressable style={styles.modalOverlay} onPress={() => setModalVisible(false)}>
-            <Pressable style={[styles.modalContent, { backgroundColor: modalBackgroundColor }]} onPress={e => e.stopPropagation()}>
-                <View style={styles.modalHeader}>
-                    <Text style={[styles.modalTitle, { color: textColor }]}>Select Items</Text>
-                    <Pressable onPress={() => setModalVisible(false)}>
-                        <Text style={styles.closeButton}>×</Text>
-                    </Pressable>
-                </View>
-
-                <TextInput
-                    style={[styles.searchInput, { backgroundColor: inputBackgroundColor, color: inputTextColor, borderColor }]}
-                    placeholder="Search..."
-                    placeholderTextColor={isDarkMode ? "#888" : "#999"}
-                    value={searchTerm}
-                    onChangeText={setSearchTerm}
-                />
-
-                <View style={styles.bulkActionsContainer}>
-                    <Pressable onPress={handleSelectAll} style={styles.bulkActionButton}>
-                        <Text style={styles.bulkActionButtonText}>Select All</Text>
-                    </Pressable>
-                    <Pressable onPress={handleClearAll} style={styles.bulkActionButton}>
-                        <Text style={styles.bulkActionButtonText}>Clear All</Text>
-                    </Pressable>
-                </View>
-
-                <FlatList
-                    data={filteredOptions}
-                    renderItem={renderItem}
-                    keyExtractor={(item) => item.value}
-                    ListEmptyComponent={
-                    <Text style={[styles.emptyText, { color: textColor }]}>
-                        No options found.
-                    </Text>
-                    }
-                />
+        <View style={styles.bulkActionsContainer}>
+          <Pressable onPress={handleSelectAll} style={styles.bulkActionButton}>
+            <Text style={styles.bulkActionButtonText}>Select All</Text>
           </Pressable>
-        </Pressable>
-      </Modal>
-    </SafeAreaView>
+          <Pressable onPress={handleClearAll} style={styles.bulkActionButton}>
+            <Text style={styles.bulkActionButtonText}>Clear All</Text>
+          </Pressable>
+        </View>
+
+        <FlatList
+          data={filteredOptions}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.value}
+          ListEmptyComponent={
+            <Text style={[styles.emptyText, { color: textColor }]}>
+              No options found.
+            </Text>
+          }
+        />
+      </>
+    </ModalComponent>
   );
 };
 
 // --- Styles ---
 const styles = StyleSheet.create({
-  wrapper: {
-    width: "100%",
-  },
   selectButton: {
     borderWidth: 1,
     borderRadius: 8,
@@ -180,32 +176,6 @@ const styles = StyleSheet.create({
   selectButtonText: {
     fontSize: 16,
   },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.6)",
-  },
-  modalContent: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    height: "80%",
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  closeButton: {
-    fontSize: 30,
-    fontWeight: '300',
-    color: "#888"
-  },
   searchInput: {
     height: 45,
     borderWidth: 1,
@@ -215,8 +185,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   bulkActionsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 10,
     paddingHorizontal: 5,
   },
@@ -224,16 +194,16 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   bulkActionButtonText: {
-    color: '#007AFF',
+    color: "#007AFF",
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   itemContainer: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(128, 128, 128, 0.2)',
+    borderBottomColor: "rgba(128, 128, 128, 0.2)",
   },
   checkbox: {
     width: 22,
@@ -246,16 +216,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   checkboxDark: {
-    borderColor: '#4E9FDE',
+    borderColor: "#4E9FDE",
   },
   checkboxSelected: {
     backgroundColor: "#007AFF",
-    borderColor: '#007AFF',
+    borderColor: "#007AFF",
   },
   checkmark: {
     color: "white",
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   itemText: {
     fontSize: 17,
