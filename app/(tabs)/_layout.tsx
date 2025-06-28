@@ -31,7 +31,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          headerShown:false,
+          headerShown:true,
+          headerTitle:"SEARCH WORD",
+          headerTitleAlign: 'center',
           href:null  
         }}
       />
