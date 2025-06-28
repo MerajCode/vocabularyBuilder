@@ -5,6 +5,7 @@ import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 export const settings = sqliteTable('settings', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   type: text('type'),
+  apiKey: text('apiKey'),
   timer: integer('timer').notNull(),
   unlockType: text('unlock_type'),
   unlockStatus: integer('unlock_status', { mode: 'boolean' }).default(false),
