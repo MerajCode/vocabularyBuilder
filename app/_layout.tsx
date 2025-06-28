@@ -10,10 +10,15 @@ import "react-native-reanimated";
 
 import { databaseName, sqliteDb } from "@/controller/database";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { DTheme, LTheme } from "@/utils/themeColors";
 import { SQLiteProvider } from "expo-sqlite";
 import { useSQLiteDevTools } from "expo-sqlite-devtools";
 import { useEffect } from "react";
 import { PermissionsAndroid, Platform, Text } from "react-native";
+import {
+  PaperProvider
+} from "react-native-paper";
+
 
 export default function RootLayout() {
   useSQLiteDevTools(sqliteDb);
@@ -50,19 +55,24 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <SQLiteProvider databaseName={databaseName}>
-        <Stack
-          screenOptions={{
-            animation: "ios_from_right",
-          }}
-        >
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="notifications" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-      </SQLiteProvider>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <PaperProvider theme={colorScheme === "dark" ? DTheme : LTheme}>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <SQLiteProvider databaseName={databaseName}>
+          <Stack
+            screenOptions={{
+              animation: "ios_from_right",
+            }}
+          >
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="notifications"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </SQLiteProvider>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </PaperProvider>
   );
 }
