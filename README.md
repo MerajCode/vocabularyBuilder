@@ -96,23 +96,31 @@ To enable AI-powered word suggestions, example generation, you'll need to provid
 
 ---
 
-## 📲 Getting Started
+## 🤝 Contributing
 
-### Clone the repository
-```bash
-git clone https://github.com/MerajCode/vocabularyBuilder.git
-cd vocabularyBuilder
-```
+We welcome contributions from the community!
+
+### How to Contribute
+
+1. Fork this repository
+2. Create a new branch from `master`
+3. Make your changes and test them locally
+4. Ensure your code follows ESLint + Prettier rules
+5. Submit a Pull Request with a clear description of your changes
+
+Please feel free to open issues for bugs, feature requests, or suggestions.
+
+---
 ### Run
 ```bash
 npx expo run:android
-or
+#or
 npm run start
 ```
 ### Build for Android
 ```bash
 npm run build:android
-or
+#or
 npx expo run:android --variant release
 
 ```
