@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Modal,
   Pressable,
@@ -11,29 +11,35 @@ import {
 
 interface props {
   children: React.ReactNode;
-  trigger: React.ReactNode;
+  trigger?: React.ReactNode;
   header: {
     title: string;
     icon?: React.ReactNode;
   };
+  onPress?: () => void;
+  setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  modalVisible: boolean;
 }
 
-const ModalComponent = ({ children, trigger, header }: props) => {
-  const [modalVisible, setModalVisible] = useState(false);
+const ModalComponent = ({ children, trigger, header, onPress,setModalVisible,modalVisible }: props) => {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
   const modalBackgroundColor = isDarkMode ? "#1E1E1E" : "#FFFFFF";
   const textColor = isDarkMode ? "#E0E0E0" : "#333";
-  console.log(modalVisible)
+
+  const VisibleHandle = () => {
+    setModalVisible(true);
+    onPress?.();
+  };
+
   return (
     <SafeAreaView style={styles.wrapper}>
-      <Pressable
-        onPress={() => setModalVisible(true)}
-      >
-        {trigger}
-      </Pressable>
+      <Pressable onPress={VisibleHandle}>{trigger}</Pressable>
 
       <Modal
+        style={{
+          zIndex: 1000,
+        }}
         animationType="slide"
         transparent={true}
         visible={modalVisible}
@@ -71,15 +77,6 @@ const styles = StyleSheet.create({
   wrapper: {
     width: "100%",
   },
-  selectButton: {
-    borderWidth: 1,
-    borderRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-  },
   modalOverlay: {
     flex: 1,
     justifyContent: "flex-end",
@@ -88,10 +85,11 @@ const styles = StyleSheet.create({
   modalContent: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    padding: 20,
     height: "80%",
   },
-    modalHeader: {
+  modalHeader: {
+    paddingTop:20,
+    paddingHorizontal: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -109,3 +107,4 @@ const styles = StyleSheet.create({
 });
 
 export default ModalComponent;
+  
