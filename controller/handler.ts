@@ -12,11 +12,8 @@ export type SettingInsert = InferInsertModel<typeof settings>;
 export type WordData = InferInsertModel<typeof wordlist>;
 
 class WordsDB {
-  // You already opened the DB with Drizzle globally, so no need to init here.
-
   static async insertWord(wordData: WordData): Promise<number> {
     const result = await db.insert(wordlist).values(wordData).returning();
-    // result is an array of inserted rows, get the id of first inserted
     return result[0].id;
   }
 
@@ -27,7 +24,6 @@ class WordsDB {
       .insert(scheduled_notifications)
       .values(sheduleData)
       .returning();
-    // result is an array of inserted rows, get the id of first inserted
     return result[0].id;
   }
 
@@ -77,7 +73,7 @@ class WordsDB {
 
     return result[0].id;
   }
-  
+
   static async deletebar(): Promise<void> {
     await db.delete(settings).run();
   }
@@ -87,6 +83,18 @@ class WordsDB {
     return setting;
   }
 
+  static async getAiKey(): Promise<{ apiKey: string | null }> {
+    const setting = await db
+      .select({
+        id: settings.id,
+        apiKey: settings.apiKey,
+      })
+      .from(settings)
+      .limit(1)
+      .all();
+    return setting[0];
+  }
+
   static async updateWord(id: number, wordData: WordData): Promise<void> {
     await db.update(wordlist).set(wordData).where(eq(wordlist.id, id)).run();
   }
@@ -94,7 +102,6 @@ class WordsDB {
   static async deleteWord(id: number): Promise<void> {
     await db.delete(wordlist).where(eq(wordlist.id, id)).run();
   }
-
 
   static async getWord(id: number): Promise<WordData | undefined> {
     const word = await db
@@ -107,13 +114,15 @@ class WordsDB {
   }
 
   static async getAllTypes(): Promise<string[]> {
-  const result = await db
-    .select({ type: wordlist.type })
-    .from(wordlist)
-    .groupBy(wordlist.type);
+    const result = await db
+      .select({ type: wordlist.type })
+      .from(wordlist)
+      .groupBy(wordlist.type);
 
     // Extract type values from result
-    return result.map((row) => row.type).filter((type): type is string => type !== null);;
+    return result
+      .map((row) => row.type)
+      .filter((type): type is string => type !== null);
   }
 
   static async getRandWord(type?: string): Promise<WordData | undefined> {
