@@ -92,7 +92,7 @@ To enable AI-powered word suggestions, example generation, you'll need to provid
 
 | Setting | Insert Word | Search & AutoFill |
 |------|----------------|--------------|
-| ![](resources/setting.jpg) | ![](resources/insert_word.jpg) | ![](resources/Search_tap_insert.jpg) |
+| ![](resources/Setting.jpg) | ![](resources/insert_word.jpg) | ![](resources/Search_tap_insert.jpg) |
 
 ---
 
