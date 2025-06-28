@@ -4,6 +4,7 @@ import { ThemedText } from "@/components/ThemedText";
 import WordsDB from "@/controller/handler";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { opts } from "@/utils/staticData";
+import { DTheme, LTheme } from "@/utils/themeColors";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
@@ -16,12 +17,12 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Switch,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
+
+import { Button, Switch, TextInput as TextInput2 } from "react-native-paper";
 
 // Always initialize notifications once
 
@@ -45,15 +46,16 @@ export default function NotificationControlScreen() {
     type: "",
     status: false,
   });
+  const [apiKey, setApiKey] = useState<string>("");
 
   //sticky
   const [stickySetting, setStickySetting] = useState<stickyProps>({
     type: "",
-    interval: 0,
+    interval: 144,
   });
 
   const updateSettings = useCallback(async () => {
-    Alert.alert("Success", "Update Successful.");
+    Alert.alert("Success", "updated successfully.");
     await WordsDB.SettingUpdate({
       type: stickySetting.type,
       timer: stickySetting.interval,
@@ -61,16 +63,16 @@ export default function NotificationControlScreen() {
       unlockType: unlock.type,
       presentStatus: present.status,
       presentType: present.type,
+      apiKey: apiKey,
     });
 
     NativeModules.NativeEventModule.updateStickyNotification();
-  }, [stickySetting, unlock, present]);
+  }, [stickySetting, unlock, present, apiKey]);
 
   useEffect(() => {
     const getSettings = async () => {
       const res = await WordsDB.getSetting();
       const setting = res[0];
-      console.log(setting);
       if (setting) {
         setStickySetting({ type: setting.type ?? "", interval: setting.timer });
 
@@ -82,6 +84,7 @@ export default function NotificationControlScreen() {
           status: setting.unlockStatus ?? false,
           type: setting.unlockType ?? "",
         });
+        setApiKey(setting.apiKey ?? "");
       }
     };
     getSettings(); // Load settings when component mounts
@@ -92,34 +95,13 @@ export default function NotificationControlScreen() {
 
   //dark component style
   const isDarkMode = useColorScheme();
-  const isDark = isDarkMode === "dark";
-  const Dark = isDarkMode === "dark" ? "#fff" : "#000";
+  const theme = isDarkMode === "dark" ? DTheme : LTheme;
 
   useEffect(() => {
     navigate.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          onPress={updateSettings}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 1,
-            right: 15,
-            padding: 7,
-            borderRadius: 10,
-            backgroundColor: isDark ? "#242628" : "#0a7ea4",
-          }}
-        >
-          <Text style={{ fontWeight: "bold", color: "#fff" }}>Update</Text>
-          <MaterialIcons
-            name="sync"
-            size={20}
-            color={isDark ? "#aaa" : "#fff"}
-          />
-        </TouchableOpacity>
-      ),
+      headerRight: () => <Button onPress={updateSettings} icon={"update"} >Update</Button>,
     });
-  }, [Dark, navigate, updateSettings]);
+  }, [navigate, updateSettings]);
 
   return (
     <KeyboardAvoidingView
@@ -127,15 +109,19 @@ export default function NotificationControlScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={90}
     >
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps="handled">
         <Item
-          icon={<Octicons name="screen-normal" size={18} color={Dark} />}
+          icon={
+            <Octicons
+              name="screen-normal"
+              size={18}
+              color={theme.colors.onSurface}
+            />
+          }
           title="Notify on User Present"
           link={
             <Switch
-              style={{ height: 20 }}
               value={present.status}
-              trackColor={{ false: "#767577", true: "#81b0ff" }}
               onValueChange={(status) =>
                 setPresent((pre) => ({ ...pre, status }))
               }
@@ -155,12 +141,12 @@ export default function NotificationControlScreen() {
           }
         />
         <Item
-          icon={<Octicons name="unlock" size={18} color={Dark} />}
+          icon={
+            <Octicons name="unlock" size={18} color={theme.colors.onSurface} />
+          }
           title="Notify on Unlock"
           link={
             <Switch
-              style={{ height: 20 }}
-              trackColor={{ false: "#767577", true: "#81b0ff" }}
               value={unlock.status}
               onValueChange={(status) =>
                 setUnlock((pre) => ({ ...pre, status }))
@@ -181,12 +167,20 @@ export default function NotificationControlScreen() {
 
         <Divider title="Schedule Notifications" />
         <Item
-          icon={<MaterialIcons name="schedule" size={18} color={Dark} />}
+          icon={
+            <MaterialIcons
+              name="schedule"
+              size={18}
+              color={theme.colors.onSurface}
+            />
+          }
           title="Create Schedule Notification"
           onPress={() => navigation.push("/notifications")}
         />
         <Item
-          icon={<Feather name="list" size={18} color={Dark} />}
+          icon={
+            <Feather name="list" size={18} color={theme.colors.onSurface} />
+          }
           title="Schedule List"
           onPress={() => navigation.push("/notifications/scheduled")}
         />
@@ -212,19 +206,21 @@ export default function NotificationControlScreen() {
               />
             </View>
           </View>
+        </View>
+        <View style={styles.container}>
           <View style={styles.items}>
             <ThemedText style={styles.label}>Interval (min)</ThemedText>
             <TextInput
               style={[
                 styles.input,
                 {
-                  color: Dark,
+                  color: theme.colors.onSurface,
                   borderWidth: 1,
-                  borderColor: isDark ? "#444" : "#ccc",
+                  borderColor: theme.colors.outline,
                   borderRadius: 5,
                 },
               ]}
-              placeholderTextColor={isDark ? "#aaa" : "#666"}
+              placeholderTextColor={theme.colors.onSurface}
               keyboardType="number-pad"
               value={String(stickySetting.interval)}
               onChangeText={(interval) =>
@@ -235,23 +231,36 @@ export default function NotificationControlScreen() {
               }
             />
           </View>
-          <ThemedText
-            style={{
-              padding: 15,
-              fontSize: 14,
-              fontStyle: "italic",
-              textAlign: "center",
-            }}
-          >
-            Type valid word type from your list to continue exploring new
-            vocabulary!
-          </ThemedText>
-          <Item
-            icon={<Feather name="info" size={18} color={Dark} />}
-            title="About App"
-            onPress={() => navigation.push("/notifications/about")}
-          />
         </View>
+        <Divider title="Enter Google Ai Studio Api Key" />
+        <TextInput2
+          value={apiKey}
+          secureTextEntry
+          mode="outlined"
+          outlineStyle={{ borderRadius: 13 }}
+          dense={true}
+          style={{ marginHorizontal: 8, textAlign: "center" }}
+          returnKeyType="next"
+          onChangeText={(api) => setApiKey(api)}
+        />
+        <Item
+          icon={
+            <Feather name="info" size={18} color={theme.colors.onSurface} />
+          }
+          title="About App"
+          onPress={() => navigation.push("/notifications/about")}
+        />
+        <ThemedText
+          style={{
+            padding: 15,
+            fontSize: 14,
+            fontStyle: "italic",
+            textAlign: "center",
+          }}
+        >
+          Type valid word type from your list to continue exploring new
+          vocabulary!
+        </ThemedText>
       </ScrollView>
     </KeyboardAvoidingView>
   );
