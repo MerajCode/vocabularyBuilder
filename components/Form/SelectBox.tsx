@@ -1,7 +1,8 @@
+import { DTheme, LTheme } from "@/utils/themeColors";
 import { AntDesign } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useRef, useState } from "react";
-import { Text, TouchableHighlight, useColorScheme, View } from "react-native";
+import { Text, TouchableHighlight, useColorScheme, View, ViewStyle } from "react-native";
 
 interface ops {
   value: string;
@@ -13,11 +14,12 @@ interface props {
   selectedValue: string;
   placeholder?: string;
   onValueChange: (value: string) => void;
+  style?: ViewStyle;
 }
 
-const SelectBox = ({ options, selectedValue, onValueChange, placeholder }: props) => {
+const SelectBox = ({ options, selectedValue, onValueChange, placeholder,style }: props) => {
   const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === "dark";
+  const theme = colorScheme === "dark"? DTheme:LTheme;
 
   const pickerRef = useRef<Picker<string>>(null);
   const [value, setValue] = useState<string>("");
@@ -33,23 +35,24 @@ const SelectBox = ({ options, selectedValue, onValueChange, placeholder }: props
         onPress={() => pickerRef.current?.focus()}
       >
         <View
-          style={{
+          style={[{
             borderWidth: 1,
-            borderColor: isDarkMode ? "#444" : "#ccc",
-            borderRadius: 6,
+            borderColor: theme.colors.outline,
+            backgroundColor: theme.colors.background,
+            borderRadius: 13,
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: 9,
-          }}
+            padding: 14,
+          },style]}
         >
-          <Text style={{ color: isDarkMode ? "#aaa" : "#666" }}>
+          <Text style={{ color: theme.colors.onSurface }}>
             {value.length > 6 ? `${value?.slice(0, 6)}...` : (value || placeholder)}
           </Text>
           <AntDesign
             name="caretdown"
             size={14}
-            color={isDarkMode ? "#444" : "#ccc"}
+            color={theme.colors.onSurface}
           />
         </View>
       </TouchableHighlight>

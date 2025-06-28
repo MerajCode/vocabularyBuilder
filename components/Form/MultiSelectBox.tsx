@@ -1,3 +1,4 @@
+import { DTheme, LTheme } from "@/utils/themeColors";
 import React, { useMemo, useState } from "react";
 import {
   FlatList,
@@ -30,7 +31,8 @@ const MultiSelectBox = ({
 }: props) => {
   const [searchTerm, setSearchTerm] = useState("");
   const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === "dark";
+  const theme = colorScheme === "dark" ? DTheme:LTheme;
+  const [modalVisible, setModalVisible] = useState(false);
 
   const selectedItemsArray = useMemo(() => {
     if (!selectedValue) return [];
@@ -86,7 +88,7 @@ const MultiSelectBox = ({
             styles.checkbox,
             selected
               ? styles.checkboxSelected
-              : isDarkMode
+              : colorScheme==="dark"
               ? styles.checkboxDark
               : {},
           ]}
@@ -94,7 +96,7 @@ const MultiSelectBox = ({
           {selected && <Text style={styles.checkmark}>✓</Text>}
         </View>
         <Text
-          style={[styles.itemText, { color: isDarkMode ? "#E0E0E0" : "#333" }]}
+          style={[styles.itemText, { color: theme.colors.onSurface }]}
         >
           {item.label}
         </Text>
@@ -103,13 +105,15 @@ const MultiSelectBox = ({
   };
 
   // Styles for dark and light mode
-  const textColor = isDarkMode ? "#E0E0E0" : "#333";
-  const inputBackgroundColor = isDarkMode ? "#333333" : "#F0F0F0";
-  const inputTextColor = isDarkMode ? "#FFFFFF" : "#000000";
-  const borderColor = isDarkMode ? "#444" : "#ccc";
+  const textColor = theme.colors.onSurface;
+  const inputBackgroundColor = theme.colors.surface;
+  const inputTextColor = theme.colors.onSurface;
+  const borderColor = theme.colors.outline;
 
   return (
     <ModalComponent
+      modalVisible={modalVisible}
+      setModalVisible={setModalVisible}
       trigger={
         <View style={[styles.selectButton, { borderColor }]}>
           <Text style={[styles.selectButtonText, { color: textColor }]}>
@@ -123,34 +127,40 @@ const MultiSelectBox = ({
       header={{ title: "Select Items" }}
     >
       <>
-        <TextInput
-          style={[
-            styles.searchInput,
-            {
-              backgroundColor: inputBackgroundColor,
-              color: inputTextColor,
-              borderColor,
-            },
-          ]}
-          placeholder="Search..."
-          placeholderTextColor={isDarkMode ? "#888" : "#999"}
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-        />
+        <View style={{ paddingHorizontal: 15 }}>
+          <TextInput
+            style={[
+              styles.searchInput,
+              {
+                backgroundColor: inputBackgroundColor,
+                color: inputTextColor,
+                borderColor,
+              },
+            ]}
+            placeholder="Search..."
+            placeholderTextColor={theme.colors.onSurface}
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+          />
 
-        <View style={styles.bulkActionsContainer}>
-          <Pressable onPress={handleSelectAll} style={styles.bulkActionButton}>
-            <Text style={styles.bulkActionButtonText}>Select All</Text>
-          </Pressable>
-          <Pressable onPress={handleClearAll} style={styles.bulkActionButton}>
-            <Text style={styles.bulkActionButtonText}>Clear All</Text>
-          </Pressable>
+          <View style={styles.bulkActionsContainer}>
+            <Pressable
+              onPress={handleSelectAll}
+              style={styles.bulkActionButton}
+            >
+              <Text style={styles.bulkActionButtonText}>Select All</Text>
+            </Pressable>
+            <Pressable onPress={handleClearAll} style={styles.bulkActionButton}>
+              <Text style={styles.bulkActionButtonText}>Clear All</Text>
+            </Pressable>
+          </View>
         </View>
 
         <FlatList
           data={filteredOptions}
           renderItem={renderItem}
           keyExtractor={(item) => item.value}
+          style={{ paddingHorizontal: 15 }}
           ListEmptyComponent={
             <Text style={[styles.emptyText, { color: textColor }]}>
               No options found.
