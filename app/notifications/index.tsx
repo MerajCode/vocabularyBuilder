@@ -5,14 +5,8 @@ import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { opts } from "@/utils/staticData";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-  Alert,
-  Button,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  View,
-} from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import { Button, TextInput } from "react-native-paper";
 
 export default function Index() {
   const [customTime, setCustomTime] = useState("10"); // in seconds
@@ -32,37 +26,54 @@ export default function Index() {
     Alert.alert("Success", "ID : " + result + " Scheduled successfully.");
   };
 
-  const isDarkMode = useColorScheme() ==="dark";
+  const isDarkMode = useColorScheme() === "dark";
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Time Input */}
       <ThemedText style={styles.header}>Schedule Notification</ThemedText>
       <View style={{ paddingVertical: 10 }}>
-        <ThemedText>Custom Time (in minuts)</ThemedText>
         <TextInput
+          mode="outlined"
+          outlineStyle={{ borderRadius: 13 }}
+          returnKeyType="next"
           value={customTime}
           onChangeText={setCustomTime}
           keyboardType="numeric"
-          style={[styles.input, { color: isDarkMode ? "white" : "black",borderColor: isDarkMode ? "#444" : "#ccc" }]}
+          label={"Custom Time (in minuts)"}
+          style={[
+            styles.input,
+            {
+              color: isDarkMode ? "white" : "black",
+              borderColor: isDarkMode ? "#444" : "#ccc",
+            },
+          ]}
         />
       </View>
 
-      <View style={{ paddingVertical: 10,gap:5 }}>
+      <View style={{ paddingVertical: 10, gap: 5 }}>
         <ThemedText>Word Type</ThemedText>
-        <SelectBox onValueChange={setType} selectedValue={type} options={cusOps} placeholder="Word Type" />
+        <SelectBox
+          onValueChange={setType}
+          selectedValue={type}
+          options={cusOps}
+          placeholder="Word Type"
+        />
       </View>
 
       {/* Buttons */}
       <View style={styles.section}>
-        <Button title="Schedule Notification" onPress={insertNotification} />
-        <Button
-          title="Schedule List"
-          onPress={() => navigation.push("/notifications/scheduled")}
-        />
+        <Button mode="contained" onPress={insertNotification}>Schedule Notification</Button>
+        <Button mode="contained" onPress={() => navigation.push("/notifications/scheduled")}>
+          Schedule List
+        </Button>
       </View>
       <View style={styles.section}>
-        <ThemedText style={{ textAlign: "center" ,fontSize:13,fontStyle:"italic"}}>Minimum allowed time is 1 minute. Please set your custom timer.</ThemedText>
+        <ThemedText
+          style={{ textAlign: "center", fontSize: 13, fontStyle: "italic" }}
+        >
+          Minimum allowed time is 1 minute. Please set your custom timer.
+        </ThemedText>
       </View>
     </ScrollView>
   );
@@ -87,10 +98,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   input: {
-    borderWidth:1,
-    padding: 8,
     marginTop: 5,
-    borderRadius: 5,
   },
   section: {
     marginTop: 30,
@@ -98,4 +106,4 @@ const styles = StyleSheet.create({
   },
 });
 
-const cusOps = [{ value: "", label: "Any" },...opts];
+const cusOps = [{ value: "", label: "Any" }, ...opts];
